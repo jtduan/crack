@@ -21,17 +21,24 @@ static const char *className = "cn/jtduan/crack/NativeAPI";
 static char key[10] = "123456789";
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
+static void basic1(JNIEnv *env, jobject) {
+    char arr[10];
+    for (int i = 0; i < 10; i++) {
+        arr[i] = (char) ('g' + i);
+    }
+}
+
+//定义对应Java native方法的 C++ 函数，函数名可以随意命名
 static jstring sayHello(JNIEnv *env, jobject) {
     return env->NewStringUTF(key);
 }
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
-static jstring updateKey(JNIEnv *env, jobject, jstring str_) {
+static void updateKey(JNIEnv *env, jobject, jstring str_) {
     const char *str = env->GetStringUTFChars(str_, 0);
     for (int i = 0; i < strlen(str); i++) {
-        key[i] = str[i];
+        key[i] = (char) ('a' + i);
     }
-    return env->NewStringUTF("success");
 }
 
 //初始化方法
@@ -60,7 +67,8 @@ static jstring callJava(JNIEnv *env, jobject, jstring str_) {
 static JNINativeMethod jni_Methods_table[] = {
         {"stringFromJNI", "()Ljava/lang/String;",                   (void *) sayHello},
         {"callJava",      "(Ljava/lang/String;)Ljava/lang/String;", (void *) callJava},
-        {"updateKey",     "(Ljava/lang/String;)Ljava/lang/String;", (void *) updateKey},
+        {"updateKey",     "(Ljava/lang/String;)V",                  (void *) updateKey},
+        {"basic1",        "()V",                                    (void *) basic1},
 };
 
 //根据函数映射表注册函数

@@ -15,8 +15,8 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("====" + context.getClass().getName());
 
         TextView tv = findViewById(R.id.sample_text);
-        new NativeAPI().updateKey("345");
+        NativeAPI.updateKey("345");
 //        tv.setText("res=" + new NativeAPI().callJava("123"));
-        tv.setText("res=" + new NativeAPI().stringFromJNI());
+        tv.setText("res=" + NativeAPI.stringFromJNI());
     }
 }

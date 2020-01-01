@@ -5,11 +5,19 @@ public class NativeAPI {
         System.loadLibrary("native-lib");
     }
 
-    public native String stringFromJNI();
+    public static native void basic1();
 
-    public native String callJava(String param);
+//    public static native void onlySysCall();
+//
+//    public static native String onlyJni();
+//
+//    public static native String mallocJni();
 
-    public native String updateKey(String param);
+    public static native String callJava(String param);
+
+    public static native void updateKey(String param);
+
+    public static native String stringFromJNI();
 
     public static String strFromJava(String param) {
         return "string from java," + innerFunc(param);
