@@ -29,6 +29,19 @@ static void basic1(JNIEnv *env, jobject) {
 }
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
+static jlong testLong(JNIEnv *env, jobject, jint param1, jlong param2) {
+    param2 += param1;
+    return param2;
+}
+
+//获取系统时间
+static jlong testSyscall(JNIEnv *env, jobject) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return 1000 * (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+}
+
+//定义对应Java native方法的 C++ 函数，函数名可以随意命名
 static jstring sayHello(JNIEnv *env, jobject) {
     return env->NewStringUTF(key);
 }
@@ -69,6 +82,8 @@ static JNINativeMethod jni_Methods_table[] = {
         {"callJava",      "(Ljava/lang/String;)Ljava/lang/String;", (void *) callJava},
         {"updateKey",     "(Ljava/lang/String;)V",                  (void *) updateKey},
         {"basic1",        "()V",                                    (void *) basic1},
+        {"testLong",      "(IJ)J",                                  (void *) testLong},
+        {"testSyscall",   "()J",                                    (void *) testSyscall},
 };
 
 //根据函数映射表注册函数

@@ -17,6 +17,10 @@ public class NativeAPI {
 
     public static native void updateKey(String param);
 
+    public static native long testLong(int a, long ts);
+
+    public static native long testSyscall();
+
     public static native String stringFromJNI();
 
     public static String strFromJava(String param) {
