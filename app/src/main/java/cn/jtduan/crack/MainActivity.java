@@ -2,10 +2,14 @@ package cn.jtduan.crack;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.lody.whale.xposed.XC_MethodHook;
+import com.lody.whale.xposed.XposedHelpers;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -14,6 +18,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Context context = getApplicationContext();
         System.out.println("====" + context.getClass().getName());
+
+        XposedHelpers.findAndHookMethod("cn.jtduan.crack.NativeAPI", this.getClassLoader(), "testSyscall", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log.e("AAA", "testSysCall");
+                super.beforeHookedMethod(param);
+            }
+
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                Log.e("AAA", "testSysCall res=" + param.getResult());
+                super.afterHookedMethod(param);
+            }
+        });
 
         TextView tv = findViewById(R.id.sample_text);
         NativeAPI.updateKey("345");
