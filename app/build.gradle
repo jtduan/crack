@@ -18,6 +18,9 @@ android {
                 cppFlags ""
             }
         }
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
     }
 
     sourceSets {
@@ -34,8 +37,9 @@ android {
     }
 
     externalNativeBuild {
+
         cmake {
-            path "src/main/cpp/CMakeLists.txt"
+            path "CMakeLists.txt"
             version "3.10.2"
         }
     }

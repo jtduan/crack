@@ -2,7 +2,7 @@ package cn.jtduan.crack;
 
 public class NativeAPI {
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("myc");
     }
 
     public static native void basic1();

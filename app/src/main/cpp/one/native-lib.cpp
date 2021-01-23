@@ -1,7 +1,10 @@
 #include <jni.h>
 #include "android/log.h"
+#include "../../include/three.h"
+#include "../../include/whale.h"
 #include <stdio.h>
 #include <string>
+#include <dlfcn.h>
 
 #ifndef LOG_TAG
 #define LOG_TAG "JNI_LOG" //Log 的 tag 名字
@@ -19,6 +22,13 @@ extern "C" {
 //定义类名
 static const char *className = "cn/jtduan/crack/NativeAPI";
 static char key[10] = "123456789";
+
+char *(*Origin_testSyscall)(JNIEnv *env, jobject);
+
+char *Hooked_testSyscall(JNIEnv *env, jobject obj) {
+    char *(*O)(JNIEnv *, jobject) = Origin_testSyscall;
+    return O(env, obj);
+}
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
 static void basic1(JNIEnv *env, jobject) {
@@ -117,6 +127,18 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     registerNativeMethods(env, className, jni_Methods_table,
                           sizeof(jni_Methods_table) / sizeof(JNINativeMethod));
+
+    std::string tag = "ndk third called";
+    char* msg = "日志打印";
+    __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(1, 6), msg);
+
+    void *symbol = (void *) testSyscall;
+    WInlineHookFunction(
+            symbol,
+            reinterpret_cast<void *>(Hooked_testSyscall),
+            reinterpret_cast<void **>(&Origin_testSyscall)
+    );
+
 
     return JNI_VERSION_1_4;
 }
