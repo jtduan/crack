@@ -27,6 +27,9 @@ char *(*Origin_testSyscall)(JNIEnv *env, jobject);
 
 char *Hooked_testSyscall(JNIEnv *env, jobject obj) {
     char *(*O)(JNIEnv *, jobject) = Origin_testSyscall;
+    std::string tag = "ndk third called";
+    char* msg = "日志打印";
+    __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(3, 6), msg);
     return O(env, obj);
 }
 
