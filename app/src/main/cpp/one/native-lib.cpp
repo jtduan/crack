@@ -28,9 +28,28 @@ char *(*Origin_testSyscall)(JNIEnv *env, jobject);
 char *Hooked_testSyscall(JNIEnv *env, jobject obj) {
     char *(*O)(JNIEnv *, jobject) = Origin_testSyscall;
     std::string tag = "ndk third called";
-    char* msg = "日志打印";
+    char *msg = "日志打印";
     __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(3, 6), msg);
     return O(env, obj);
+}
+
+int (*Origin_func)(const char *__name, char *__value);
+
+int Hooked_func(const char *__name, char *__value) {
+    int (*O)(const char *, char *) = Origin_func;
+    std::string tag = "ndk third called";
+    char *msg = "日志打印";
+    __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(3, 6), __name);
+    if (!strcmp(__name, "ro.build.id")) {
+        __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(3, 6), __name);
+        return 10;
+    }
+    return O(__name, __value);
+//    char arr[10];
+//    for (int i = 0; i < 10; i++) {
+//        arr[i] = (char) ('g' + i);
+//    }
+//    __value = arr
 }
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
@@ -56,7 +75,9 @@ static jlong testSyscall(JNIEnv *env, jobject) {
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
 static jstring sayHello(JNIEnv *env, jobject) {
-    return env->NewStringUTF(key);
+    char buf[100];
+    __system_property_get("ro.build.id", buf);
+    return env->NewStringUTF(buf);
 }
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
@@ -132,8 +153,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
                           sizeof(jni_Methods_table) / sizeof(JNINativeMethod));
 
     std::string tag = "ndk third called";
-    char* msg = "日志打印";
+    char *msg = "日志打印";
     __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(1, 6), msg);
+
 
     void *symbol = (void *) testSyscall;
     WInlineHookFunction(
@@ -142,6 +164,12 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
             reinterpret_cast<void **>(&Origin_testSyscall)
     );
 
+//    void *symbol2 = (void *) __system_property_get;
+//    WInlineHookFunction(
+//            symbol2,
+//            reinterpret_cast<void *>(Hooked_func),
+//            reinterpret_cast<void **>(&Origin_func)
+//    );
 
     return JNI_VERSION_1_4;
 }
