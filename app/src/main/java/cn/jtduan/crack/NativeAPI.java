@@ -21,7 +21,7 @@ public class NativeAPI {
 
     public static native long testSyscall();
 
-    public static native String stringFromJNI();
+    public static native String propertityGet();
 
     public static String strFromJava(String param) {
         return "string from java," + innerFunc(param);

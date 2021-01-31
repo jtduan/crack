@@ -2,6 +2,7 @@
 #include "android/log.h"
 #include "../../include/three.h"
 #include "../../include/whale.h"
+#include "../../include/sandhook_native.h"
 #include <stdio.h>
 #include <string>
 #include <dlfcn.h>
@@ -23,12 +24,12 @@ extern "C" {
 static const char *className = "cn/jtduan/crack/NativeAPI";
 static char key[10] = "123456789";
 
-char *(*Origin_testSyscall)(JNIEnv *env, jobject);
+jlong (*Origin_testSyscall)(JNIEnv *env, jobject);
 
-char *Hooked_testSyscall(JNIEnv *env, jobject obj) {
-    char *(*O)(JNIEnv *, jobject) = Origin_testSyscall;
+jlong Hooked_testSyscall(JNIEnv *env, jobject obj) {
+    jlong (*O)(JNIEnv *, jobject) = Origin_testSyscall;
     std::string tag = "ndk third called";
-    char *msg = "日志打印";
+    char *msg = "hook jni";
     __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(3, 6), msg);
     return O(env, obj);
 }
@@ -38,18 +39,12 @@ int (*Origin_func)(const char *__name, char *__value);
 int Hooked_func(const char *__name, char *__value) {
     int (*O)(const char *, char *) = Origin_func;
     std::string tag = "ndk third called";
-    char *msg = "日志打印";
-    __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(3, 6), __name);
     if (!strcmp(__name, "ro.build.id")) {
-        __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(3, 6), __name);
-        return 10;
+        __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(4, 6), __name);
+        strcpy(__value, "hooked id");
+        return 9;
     }
     return O(__name, __value);
-//    char arr[10];
-//    for (int i = 0; i < 10; i++) {
-//        arr[i] = (char) ('g' + i);
-//    }
-//    __value = arr
 }
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
@@ -74,7 +69,7 @@ static jlong testSyscall(JNIEnv *env, jobject) {
 }
 
 //定义对应Java native方法的 C++ 函数，函数名可以随意命名
-static jstring sayHello(JNIEnv *env, jobject) {
+static jstring propertityGet(JNIEnv *env, jobject) {
     char buf[100];
     __system_property_get("ro.build.id", buf);
     return env->NewStringUTF(buf);
@@ -112,7 +107,7 @@ static jstring callJava(JNIEnv *env, jobject, jstring str_) {
  * 参数3：C++定义对应 Java native方法的函数名，注意是空指针类型
  */
 static JNINativeMethod jni_Methods_table[] = {
-        {"stringFromJNI", "()Ljava/lang/String;",                   (void *) sayHello},
+        {"propertityGet", "()Ljava/lang/String;",                   (void *) propertityGet},
         {"callJava",      "(Ljava/lang/String;)Ljava/lang/String;", (void *) callJava},
         {"updateKey",     "(Ljava/lang/String;)V",                  (void *) updateKey},
         {"basic1",        "()V",                                    (void *) basic1},
@@ -158,18 +153,25 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 
     void *symbol = (void *) testSyscall;
-    WInlineHookFunction(
-            symbol,
-            reinterpret_cast<void *>(Hooked_testSyscall),
-            reinterpret_cast<void **>(&Origin_testSyscall)
-    );
+//    WInlineHookFunction(
+//            symbol,
+//            reinterpret_cast<void *>(Hooked_testSyscall),
+//            reinterpret_cast<void **>(&Origin_testSyscall)
+//    );
 
+//    Origin_testSyscall = reinterpret_cast<jlong (*)(JNIEnv *, jobject)>((jlong *) SandInlineHook(
+//            symbol, (void *) Hooked_testSyscall));
+
+//whale hook __system_property_get fail
 //    void *symbol2 = (void *) __system_property_get;
 //    WInlineHookFunction(
 //            symbol2,
 //            reinterpret_cast<void *>(Hooked_func),
 //            reinterpret_cast<void **>(&Origin_func)
 //    );
+
+    Origin_func = reinterpret_cast<int (*)(const char *, char *)>(SandInlineHook(
+            (void *) __system_property_get, (void *) Hooked_func));
 
     return JNI_VERSION_1_4;
 }

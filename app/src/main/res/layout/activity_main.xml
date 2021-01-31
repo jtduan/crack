@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ff0000"
-        android:text="textview1"/>
+        android:text="textview1" />
 
     <Button
         android:id="@+id/button"
@@ -26,4 +26,12 @@
         android:layout_below="@+id/button"
         android:onClick="func2"
         android:text="点击读取设备信息" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button2"
+        android:onClick="func3"
+        android:text="点击读取JNI设备信息" />
 </RelativeLayout>

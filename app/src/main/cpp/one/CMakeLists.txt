@@ -22,6 +22,14 @@ add_library(whale SHARED IMPORTED )
 set_target_properties(whale PROPERTIES IMPORTED_LOCATION
         ${libs}/${ANDROID_ABI}/libwhale.so)
 
+add_library(sandhook SHARED IMPORTED )
+set_target_properties(sandhook PROPERTIES IMPORTED_LOCATION
+        ${libs}/${ANDROID_ABI}/libsandhook.so)
+
+add_library(sandhooknative SHARED IMPORTED )
+set_target_properties(sandhook PROPERTIES IMPORTED_LOCATION
+        ${libs}/${ANDROID_ABI}/libsandhook-native.so)
+
 add_library( # Sets the name of the library.
         myc
 
@@ -51,7 +59,7 @@ target_include_directories(myc PRIVATE
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-target_link_libraries(myc android three whale log
+target_link_libraries(myc android three whale sandhook log
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
