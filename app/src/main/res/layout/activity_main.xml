@@ -34,4 +34,12 @@
         android:layout_below="@+id/button2"
         android:onClick="func3"
         android:text="点击读取JNI设备信息" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button3"
+        android:onClick="func4"
+        android:text="加载外部dex测试" />
 </RelativeLayout>

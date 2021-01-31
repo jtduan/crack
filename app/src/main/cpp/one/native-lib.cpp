@@ -147,12 +147,12 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     registerNativeMethods(env, className, jni_Methods_table,
                           sizeof(jni_Methods_table) / sizeof(JNINativeMethod));
 
-    std::string tag = "ndk third called";
+    std::string tag = "init";
     char *msg = "日志打印";
     __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), "%d%s\n", sum(1, 6), msg);
 
 
-    void *symbol = (void *) testSyscall;
+//    void *symbol = (void *) testSyscall;
 //    WInlineHookFunction(
 //            symbol,
 //            reinterpret_cast<void *>(Hooked_testSyscall),
@@ -170,8 +170,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 //            reinterpret_cast<void **>(&Origin_func)
 //    );
 
-    Origin_func = reinterpret_cast<int (*)(const char *, char *)>(SandInlineHook(
-            (void *) __system_property_get, (void *) Hooked_func));
+//    Origin_func = reinterpret_cast<int (*)(const char *, char *)>(SandInlineHook(
+//            (void *) __system_property_get, (void *) Hooked_func));
 
     return JNI_VERSION_1_4;
 }
